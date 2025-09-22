@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr" data-lt-installed="true">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Synthèses de couleurs</title>
+    <!-- Feuille de style locale -->
+    <link href="./1ʳᵉ - Couleurs - Synthèse des couleurs interactive_files/styles.css" rel="stylesheet">
+    <!-- Dépendances locales (aucun accès internet requis) -->
+    <script defer src="./1ʳᵉ - Couleurs - Synthèse des couleurs interactive_files/createjs.min.js.téléchargement"></script>
+    <script defer src="./1ʳᵉ - Couleurs - Synthèse des couleurs interactive_files/scripts.js.téléchargement"></script>
+    <script>
+        // ----- Gestion du thème -----
+    (function () {
+      function applyTheme(mode) {
+        // mode: 'system' | 'dark' | 'light'
+        const root = document.documentElement;
+        if (mode === 'dark') {
+          root.setAttribute('data-theme', 'dark');
+          try { localStorage.setItem('theme', 'dark'); } catch {}
+        } else if (mode === 'light') {
+          root.setAttribute('data-theme', 'light');
+          try { localStorage.setItem('theme', 'light'); } catch {}
+        } else {
+          // system
+          root.removeAttribute('data-theme');
+          try { localStorage.removeItem('theme'); } catch {}
+        }
+        updateThemeUI(mode);
+      }
+
+      function getInitialMode() {
+        try {
+          const saved = localStorage.getItem('theme'); // 'dark'|'light'|null
+          return saved === 'dark' || saved === 'light' ? saved : 'system';
+        } catch { return 'system'; }
+      }
+
+      function updateThemeUI(mode) {
+        // Met à jour : icône du FAB, état coché du menu, titre
+        const fab = document.getElementById('themeToggle');
+        const ico = fab ? fab.querySelector('.theme-ico') : null;
+        const items = document.querySelectorAll('.theme-menu .theme-item');
+
+        items.forEach(btn => {
+          const m = btn.getAttribute('data-mode');
+          btn.setAttribute('aria-checked', String(m === mode));
+        });
+
+        if (ico) {
+          ico.classList.remove('system', 'dark', 'light', 'bump');
+          ico.classList.add(mode);
+          // micro-bounce
+          void ico.offsetWidth;
+          ico.classList.add('bump');
+        }
+        if (fab) {
+          const label =
+            mode === 'system' ? 'Système' :
+            mode === 'dark'   ? 'Sombre'  : 'Clair';
+          fab.title = `Thème : ${label} (cliquer pour changer)`;
+          fab.setAttribute('aria-label', `Basculer le thème, actuel : ${label}`);
+        }
+      }
+
+      // Expose pour le script de la page
+      window.__Theme = {
+        apply: applyTheme,
+        current: getInitialMode
+      };
+
+      // Appliquer le mode au chargement
+      applyTheme(getInitialMode());
+
+      // Si on suit le système, se mettre à jour si le système change
+      if (window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        mq.addEventListener('change', () => {
+          // seulement si on est en mode 'system' (pas d’attribut sur <html>)
+          if (!document.documentElement.getAttribute('data-theme')) {
+            updateThemeUI('system'); // l’UI reste "Système"
+          }
+        });
+      }
+    })();
+  </script>
+</head>
+
+<body>
+    <main>
+        <section id="add" class="panel">
+            <h1>Synthèse additive</h1>
+            <div class="canvas-wrap">
+                <canvas id="canvas1" width="500" height="500"></canvas>
+            </div>
+        </section>
+        <section id="sous" class="panel">
+            <h1>Synthèse soustractive</h1>
+            <div class="canvas-wrap">
+                <canvas id="canvas2" width="500" height="500"></canvas>
+            </div>
+        </section>
+    </main>
+    <!-- Bouton flottant + menu tri-état (Système / Sombre / Clair) -->
+    <button id="themeToggle" class="theme-fab" type="button" aria-haspopup="menu" aria-expanded="false" title="Thème : Système (cliquer pour changer)">
+        <span class="theme-ico system" aria-hidden="true"></span>
+    </button>
+    <div id="themeMenu" class="theme-menu" role="menu" aria-label="Choisir le thème" hidden>
+        <button class="theme-item" role="menuitemradio" data-mode="system" aria-checked="true" type="button">
+            <span class="theme-ico system" aria-hidden="true"></span>
+            <span class="theme-label">Système</span>
+        </button>
+        <button class="theme-item" role="menuitemradio" data-mode="dark" aria-checked="false" type="button">
+            <span class="theme-ico dark" aria-hidden="true"></span>
+            <span class="theme-label">Sombre</span>
+        </button>
+        <button class="theme-item" role="menuitemradio" data-mode="light" aria-checked="false" type="button">
+            <span class="theme-ico light" aria-hidden="true"></span>
+            <span class="theme-label">Clair</span>
+        </button>
+    </div>
+    <script>
+    // ----- Interactions FAB + menu -----
+    (function() {
+        const fab = document.getElementById('themeToggle');
+        const menu = document.getElementById('themeMenu');
+
+        // Positionne le menu au-dessus du FAB
+        function positionMenu() {
+            const r = fab.getBoundingClientRect();
+            menu.style.right = `${window.innerWidth - r.right}px`;
+            menu.style.bottom = `${(window.innerHeight - r.top) + 8}px`;
+        }
+
+        function openMenu() {
+            positionMenu();
+            menu.hidden = false;
+            fab.setAttribute('aria-expanded', 'true');
+            // focus premier item sélectionné
+            const selected = menu.querySelector('.theme-item[aria-checked="true"]') || menu.querySelector('.theme-item');
+            selected && selected.focus({ preventScroll: true });
+            window.addEventListener('click', handleOutside, { capture: true });
+            window.addEventListener('resize', positionMenu);
+        }
+
+        function closeMenu() {
+            menu.hidden = true;
+            fab.setAttribute('aria-expanded', 'false');
+            window.removeEventListener('click', handleOutside, { capture: true });
+            window.removeEventListener('resize', positionMenu);
+        }
+
+        function toggleMenu() {
+            if (menu.hidden) openMenu();
+            else closeMenu();
+        }
+
+        function handleOutside(e) {
+            if (!menu.contains(e.target) && e.target !== fab) {
+                closeMenu();
+            }
+        }
+
+        fab.addEventListener('click', toggleMenu);
+        fab.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openMenu();
+            }
+        });
+
+        // Choix d’un mode
+        menu.addEventListener('click', (e) => {
+            const btn = e.target.closest('.theme-item');
+            if (!btn) return;
+            const mode = btn.getAttribute('data-mode'); // 'system'|'dark'|'light'
+            if (!mode) return;
+            window.__Theme.apply(mode);
+            closeMenu();
+            fab.focus({ preventScroll: true });
+        });
+
+        // Init UI en fonction de l’état enregistré
+        (function initUI() {
+            const mode = window.__Theme.current();
+            window.__Theme.apply(mode); // applique + met l’UI à jour
+        })();
+    })();
+    </script>
+</body>
+<footer>
+    Illustration adaptée de A. Willm —
+    <a href="https://www.ostralo.net" target="_blank">www.ostralo.net</a> —
+    Licence :
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" target="_blank">CC BY-NC-SA 4.0</a>
+</footer>
+
+</html>

@@ -1,0 +1,413 @@
+// ==============================
+//       CANVAS 1
+// ==============================
+
+modeCouleur1 = 'screen'
+
+canvas1 = document.getElementById("canvas1");
+stage1 = new createjs.Stage(canvas1);
+stage1.enableMouseOver();
+createjs.Touch.enable(stage1);
+stage1.mouseMoveOutside = true;
+
+posR = 150;
+posV = 250;
+posB = 350;
+
+// ===== FOND =====
+
+fond1Noir = new createjs.Shape();
+stage1.addChild(fond1Noir);
+fond1Noir.graphics.f('#000').rr(10, 10, 480, 290, 40).ef();
+
+// ===== HALOS =====
+
+haloRouge = new createjs.Shape();
+stage1.addChild(haloRouge);
+haloRouge.compositeOperation = modeCouleur1;
+haloRouge.cursor = 'pointer';
+haloRouge.x = 100;
+haloRouge.y = 150;
+haloRouge.graphics.rf(['#FF0000','#FF000000'],[0.94,1],0,0,0,0,0,71).dc(0,0,70);
+
+haloVert = new createjs.Shape();
+stage1.addChild(haloVert);
+haloVert.compositeOperation = modeCouleur1;
+haloVert.cursor = 'pointer';
+haloVert.x = 250;
+haloVert.y = 100;
+haloVert.graphics.rf(['#00FF00','#00FF0000'],[0.94,1],0,0,0,0,0,71).dc(0,0,70);
+
+haloBleu = new createjs.Shape();
+stage1.addChild(haloBleu);
+haloBleu.compositeOperation = modeCouleur1;
+haloBleu.cursor = 'pointer';
+haloBleu.x = 400;
+haloBleu.y = 150
+haloBleu.graphics.rf(['#0000FF','#0000FF00'],[0.94,1],0,0,0,0,0,71).dc(0,0,70);
+
+var selectionSpot;
+var faisceauAModifier;
+
+function onMouseDownHalo(evt) {
+    obj = evt.currentTarget;
+    if (obj.id == 2) {
+        selectionSpot = spotRouge;
+        faisceauAModifier = faisceauRouge;
+    }
+    if (obj.id == 3) {
+        selectionSpot = spotVert;
+        faisceauAModifier = faisceauVert;
+    }
+    if (obj.id == 4) {
+        selectionSpot = spotBleu;
+        faisceauAModifier = faisceauBleu;
+    }
+    //
+    obj.offsetX = obj.x - evt.stageX;
+    obj.offsetY = obj.y - evt.stageY;
+}
+function onPressMoveHalo(evt) {
+    obj.x = Math.min(Math.max(100, evt.stageX + obj.offsetX), 400);
+    obj.y = Math.min(Math.max(100, evt.stageY + obj.offsetY), 200);
+    //
+    angle = Math.atan2(obj.y - selectionSpot.y, obj.x - selectionSpot.x)
+    selectionSpot.rotation = angle * 180 / 3.1415 + 90;
+    faisceauAModifier.rotation = angle * 180 / 3.1415 + 90;
+    stage1.update();
+}
+function onPressUpHalo(evt) {
+    obj = evt.currentTarget;
+}
+
+haloRouge.addEventListener("mousedown", onMouseDownHalo);
+haloRouge.addEventListener("pressmove", onPressMoveHalo);
+
+haloVert.addEventListener("mousedown", onMouseDownHalo);
+haloVert.addEventListener("pressmove", onPressMoveHalo);
+
+haloBleu.addEventListener("mousedown", onMouseDownHalo);
+haloBleu.addEventListener("pressmove", onPressMoveHalo);
+
+// ===== Faisceaux =====
+
+faisceauRouge = new createjs.Shape();
+stage1.addChild(faisceauRouge);
+faisceauRouge.graphics.rf(['#990000FF', '#99000000'], [0, 1], 0, -30, 0, 0, -30, 35).mt(-18, -30).lt(-35, -80).lt(35, -80).lt(18, -30).ef();
+
+faisceauVert = new createjs.Shape();
+stage1.addChild(faisceauVert);
+faisceauVert.graphics.rf(['#009900FF', '#00990000'], [0, 1], 0, -30, 0, 0, -30, 35).mt(-18, -30).lt(-35, -80).lt(35, -80).lt(18, -30).ef();
+
+faisceauBleu = new createjs.Shape();
+stage1.addChild(faisceauBleu);
+faisceauBleu.graphics.rf(['#000099FF', '#00009900'], [0, 1], 0, -30, 0, 0, -30, 35).mt(-18, -30).lt(-35, -80).lt(35, -80).lt(18, -30).ef();
+
+
+// ===== SPOTS =====
+//
+spotRouge = new createjs.Shape();
+stage1.addChild(spotRouge);
+spotRouge.graphics.f('#333').dr(-20, -30, 40, 60);
+spotRouge.graphics.f('#666').dr(-25, -30, 5, 60);
+spotRouge.graphics.f('#666').dr(20, -30, 5, 60).ef();
+spotRouge.graphics.ss(0.5, 1).s('#000').dr(-25, -30, 50, 60).es();
+spotRouge.graphics.f('#333').mt(-18, -30).lt(-21, -38).lt(21, -38).lt(18, -30).ef();
+spotRouge.x = posR;
+spotRouge.y = 310;
+spotRouge.rotation = Math.atan2(haloRouge.y-spotRouge.y, haloRouge.x-spotRouge.x) * 180 / Math.PI + 90;
+
+faisceauRouge.x = spotRouge.x;
+faisceauRouge.y = spotRouge.y;
+faisceauRouge.rotation = Math.atan2(haloRouge.y-spotRouge.y, haloRouge.x-spotRouge.x) * 180 / Math.PI + 90;
+
+//
+spotVert = new createjs.Shape();
+stage1.addChild(spotVert);
+spotVert.graphics.f('#333').dr(-20, -30, 40, 60);
+spotVert.graphics.f('#666').dr(-25, -30, 5, 60);
+spotVert.graphics.f('#666').dr(20, -30, 5, 60).ef();
+spotVert.graphics.ss(0.5, 1).s('#000').dr(-25, -30, 50, 60).es();
+spotVert.graphics.f('#333').mt(-18, -30).lt(-21, -38).lt(21, -38).lt(18, -30).ef();
+spotVert.x = posV;
+spotVert.y = 310;
+spotVert.rotation = 0;
+
+faisceauVert.x = spotVert.x;
+faisceauVert.y = spotVert.y;
+faisceauVert.rotation = Math.atan2(haloVert.y-spotVert.y, haloVert.x-spotVert.x) * 180 / Math.PI + 90;
+
+//
+spotBleu = new createjs.Shape();
+stage1.addChild(spotBleu);
+spotBleu.graphics.f('#333').dr(-20, -30, 40, 60);
+spotBleu.graphics.f('#666').dr(-25, -30, 5, 60);
+spotBleu.graphics.f('#666').dr(20, -30, 5, 60).ef();
+spotBleu.graphics.ss(0.5, 1).s('#000').dr(-25, -30, 50, 60).es();
+spotBleu.graphics.f('#333').mt(-18, -30).lt(-21, -38).lt(21, -38).lt(18, -30).ef();
+spotBleu.x = posB;
+spotBleu.y = 310;
+spotBleu.rotation = Math.atan2(haloBleu.y-spotBleu.y, haloBleu.x-spotBleu.x) * 180 / Math.PI + 90;
+
+faisceauBleu.x = spotBleu.x;
+faisceauBleu.y = spotBleu.y;
+faisceauBleu.rotation = Math.atan2(haloBleu.y-spotBleu.y, haloBleu.x-spotBleu.x) * 180 / Math.PI + 90;
+
+// ===== CURSEURS =====
+
+var selectionHalo;
+
+function onMouseDownCurseur(evt) {
+    obj = evt.currentTarget;
+    //
+    if (obj.id == 12) {
+        selectionHalo = haloRouge;
+        faisceauAModifier = faisceauRouge;
+    }
+    if (obj.id == 13) {
+        selectionHalo = haloVert;
+        faisceauAModifier = faisceauVert;
+    }
+    if (obj.id == 14) {
+        selectionHalo = haloBleu;
+        faisceauAModifier = faisceauBleu;
+    }
+    //
+    obj.offsetY = obj.y - evt.stageY;
+}
+function onPressMoveCurseur(evt) {
+    obj.y = Math.min(Math.max(380, evt.stageY + obj.offsetY), 480);
+    //
+    selectionHalo.alpha = (100-obj.y+380)/100;
+    faisceauAModifier.alpha = (100-obj.y+380)/100;
+    stage1.update();
+}
+function onPressUpCurseur(evt) {
+    obj = evt.currentTarget;
+
+}
+
+fond1Barres = new createjs.Shape();
+stage1.addChild(fond1Barres)
+fond1Barres.graphics.ss(1,1,1).s('#000').f('#666').rr(posR-4,380,8,100,3);
+fond1Barres.graphics.ss(3).s('#444').mt(posR,384).lt(posR, 476);
+fond1Barres.graphics.ss(1,1,1).s('#000').f('#666').rr(posV-4,380,8,100,3);
+fond1Barres.graphics.ss(3).s('#444').mt(posV,384).lt(posV, 476);
+fond1Barres.graphics.ss(1,1,1).s('#000').f('#666').rr(posB-4,380,8,100,3);
+fond1Barres.graphics.ss(3).s('#444').mt(posB,384).lt(posB, 476);
+
+
+//
+curseurRouge = new createjs.Shape();
+stage1.addChild(curseurRouge);
+curseurRouge.cursor = 'pointer'
+curseurRouge.graphics.s(1).ss('#000').f('#C00').dc(0, 0, 9).ef().es();
+curseurRouge.x = posR;
+curseurRouge.y = 380;
+curseurRouge.shadow = new createjs.Shadow('#333',2,2,3)
+
+curseurRouge.addEventListener("mousedown", onMouseDownCurseur);
+curseurRouge.addEventListener("pressmove", onPressMoveCurseur);
+
+//
+curseurVert = new createjs.Shape();
+stage1.addChild(curseurVert);
+curseurVert.cursor = 'pointer'
+curseurVert.graphics.s(1).ss('#000').f('#0C0').dc(0, 0, 9).ef().es();
+curseurVert.x = posV;
+curseurVert.y = 380;
+curseurVert.shadow = new createjs.Shadow('#333',2,2,3)
+
+curseurVert.addEventListener("mousedown", onMouseDownCurseur);
+curseurVert.addEventListener("pressmove", onPressMoveCurseur);
+
+//
+curseurBleu= new createjs.Shape();
+stage1.addChild(curseurBleu);
+curseurBleu.cursor = 'pointer'
+curseurBleu.graphics.s(1).ss('#000').f('#00C').dc(0, 0, 9).ef().es();
+curseurBleu.x = posB;
+curseurBleu.y = 380;
+curseurBleu.shadow = new createjs.Shadow('#333',2,2,3)
+
+curseurBleu.addEventListener("mousedown", onMouseDownCurseur);
+curseurBleu.addEventListener("pressmove", onPressMoveCurseur);
+
+
+// ====================
+//      CANVAS 2
+// ====================
+
+canvas2 = document.getElementById("canvas2");
+stage2 = new createjs.Stage(canvas2);
+stage2.enableMouseOver();
+createjs.Touch.enable(stage2);
+stage2.mouseMoveOutside = true;
+
+modeCouleur2 = 'multiply'
+
+// ===== Fond =====
+
+fond2Blanc = new createjs.Shape();
+stage2.addChild(fond2Blanc)
+fond2Blanc.graphics.f('#fff').rr(90,75,320,330,70)
+
+
+// ===== Taches de peinture =====
+
+var tubeADeplacer;
+
+peintureCyan = new createjs.Shape()
+stage2.addChild(peintureCyan);
+peintureCyan.compositeOperation = modeCouleur2;
+peintureCyan.x = 250;
+peintureCyan.y = 310;
+peintureCyan.cursor = 'pointer';
+peintureCyan.graphics.rf(['#0ff','#099'],[0.91,1],0,0,0,0,0,71).dc(0,0,70);
+
+peintureMagenta = new createjs.Shape;
+stage2.addChild(peintureMagenta);
+peintureMagenta.compositeOperation = modeCouleur2;
+peintureMagenta.x = 165;
+peintureMagenta.y = 180;
+peintureMagenta.cursor = 'pointer';
+peintureMagenta.rotation = 120;
+peintureMagenta.graphics.rf(['#f0f','#909'],[0.91,1],0,0,0,0,0,71).dc(0,0,70);
+
+peintureJaune = new createjs.Shape();
+stage2.addChild(peintureJaune);
+peintureJaune.compositeOperation = modeCouleur2;
+peintureJaune.x = 335;
+peintureJaune.y = 180;
+peintureJaune.cursor = 'pointer';
+peintureJaune.rotation = -120;
+peintureJaune.graphics.rf(['#ff0','#990'],[0.91,1],0,0,0,0,0,71).dc(0,0,70);
+
+
+
+function onMouseDownPeinture(evt) {
+    obj = evt.currentTarget;
+    //
+    if (obj.id == 17) {
+        tubeADeplacer = tubeCyan
+    }
+    if (obj.id == 18) {
+        tubeADeplacer = tubeMagenta
+    }
+    if (obj.id == 19) {
+        tubeADeplacer = tubeJaune
+    }
+    console.log(obj.id)
+    //
+    obj.offsetX = obj.x - evt.stageX;
+    obj.offsetY = obj.y - evt.stageY;
+}
+function onPressMovePeinture(evt) {
+    obj.x = Math.min(Math.max(165, evt.stageX + obj.offsetX), 335);
+    obj.y = Math.min(Math.max(150, evt.stageY + obj.offsetY), 330);
+    tubeADeplacer.x = obj.x;
+    tubeADeplacer.y = obj.y;
+    //
+    stage2.update();
+}
+function onPressUpPeinture(evt) {
+    obj = evt.currentTarget;
+}
+
+peintureCyan.addEventListener("mousedown", onMouseDownPeinture);
+peintureCyan.addEventListener("pressmove", onPressMovePeinture);
+
+peintureMagenta.addEventListener("mousedown", onMouseDownPeinture);
+peintureMagenta.addEventListener("pressmove", onPressMovePeinture);
+
+peintureJaune.addEventListener("mousedown", onMouseDownPeinture);
+peintureJaune.addEventListener("pressmove", onPressMovePeinture);
+
+
+
+// ===== Tube =====
+
+var peintureADeplacer;
+
+tubeCyan = new createjs.Shape()
+stage2.addChild(tubeCyan);
+tubeCyan.x = 250;
+tubeCyan.y = 310;
+tubeCyan.cursor = 'pointer';
+tubeCyan.graphics.f('#999').dr(-30,160,60,10);
+tubeCyan.graphics.rf(['#666','#AAA'],[0,1],0,85,0,0,100,30).mt(-30,160).lt(-20,85).lt(20,85).lt(30,160).ef();
+tubeCyan.graphics.lf(['#666','#999','#666'],[0,0.5,1],-10,0,10,0).dr(-10,70,20,15);
+tubeCyan.graphics.f('#0FF').dc(0,120,4);
+tubeCyan.shadow = new createjs.Shadow('#333',2,2,5);
+
+tubeMagenta = new createjs.Shape;
+stage2.addChild(tubeMagenta);
+tubeMagenta.x = 165;
+tubeMagenta.y = 180;
+tubeMagenta.cursor = 'pointer';
+tubeMagenta.rotation = 120;
+tubeMagenta.graphics.f('#999').dr(-30,160,60,10);
+tubeMagenta.graphics.rf(['#666','#AAA'],[0,1],0,85,0,0,100,30).mt(-30,160).lt(-20,85).lt(20,85).lt(30,160).ef();
+tubeMagenta.graphics.lf(['#666','#999','#666'],[0,0.5,1],-10,0,10,0).dr(-10,70,20,15);
+tubeMagenta.graphics.f('#F0F').dc(0,120,4);
+tubeMagenta.shadow = new createjs.Shadow('#333',-2,2,5);
+
+tubeJaune = new createjs.Shape();
+stage2.addChild(tubeJaune);
+tubeJaune.x = 335;
+tubeJaune.y = 180;
+tubeJaune.cursor = 'pointer';
+tubeJaune.rotation = -120;
+tubeJaune.graphics.f('#999').dr(-30,160,60,10);
+tubeJaune.graphics.rf(['#666','#AAA'],[0,1],0,85,0,0,100,30).mt(-30,160).lt(-20,85).lt(20,85).lt(30,160).ef();
+tubeJaune.graphics.lf(['#666','#999','#666'],[0,0.5,1],-10,0,10,0).dr(-10,70,20,15);
+tubeJaune.graphics.f('#FF0').dc(0,120,4);
+tubeJaune.shadow = new createjs.Shadow('#333',2,2,5);
+
+
+function onMouseDownTube(evt) {
+    obj = evt.currentTarget;
+    //
+    if (obj.id == 20) {
+        peintureADeplacer = peintureCyan
+    }
+    if (obj.id == 21) {
+        peintureADeplacer = peintureMagenta
+    }
+    if (obj.id == 22) {
+        peintureADeplacer = peintureJaune
+    }
+    console.log(obj.id)
+    //
+    obj.offsetX = obj.x - evt.stageX;
+    obj.offsetY = obj.y - evt.stageY;
+}
+function onPressMoveTube(evt) {
+    obj.x = Math.min(Math.max(165, evt.stageX + obj.offsetX), 335);
+    obj.y = Math.min(Math.max(150, evt.stageY + obj.offsetY), 330);
+    peintureADeplacer.x = obj.x;
+    peintureADeplacer.y = obj.y;
+    //
+    stage2.update();
+}
+function onPressUpTube(evt) {
+    obj = evt.currentTarget;
+}
+
+tubeCyan.addEventListener("mousedown", onMouseDownTube);
+tubeCyan.addEventListener("pressmove", onPressMoveTube);
+
+tubeMagenta.addEventListener("mousedown", onMouseDownTube);
+tubeMagenta.addEventListener("pressmove", onPressMoveTube);
+
+tubeJaune.addEventListener("mousedown", onMouseDownTube);
+tubeJaune.addEventListener("pressmove", onPressMoveTube);
+
+
+// ==========================
+//      INITIALISATION
+// ==========================
+
+var context = new AudioContext()
+stage1.update();
+stage2.update();
