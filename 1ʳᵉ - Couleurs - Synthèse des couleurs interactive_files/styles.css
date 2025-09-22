@@ -1,6 +1,6 @@
 /*
 # File: styles.css
-# Description: Interface "Synthèses de couleurs" – panneaux agrandis, ratio conservé, dark mode complet. FAB (bouton) et menu en bas à droite; menu collé au bouton avec l’option la plus basse proche du bouton. ✅ DEMANDE: texte aligné à gauche avec une marge à gauche deux fois plus petite pour toutes les sélections (items du menu).
+# Description: Interface "Synthèses de couleurs" – panneaux agrandis, ratio conservé, dark mode complet. FAB (bouton) et menu en bas à droite; menu collé au bouton avec l’option la plus basse proche du bouton.
 # Author: Nicolas Richard (Nicolas.richard.dev@gmail.com)
 # Date: 12/09/2025
 # License: CC BY-NC-ND 4.0 (https://is.gd/L7062N)
@@ -22,6 +22,17 @@
     --footer-h: 90px;
     --fab-size: 60px;
     --menu-gap: 10px;
+
+    /* Mode clair: ombres plus DOUCES mais mise en évidence par un anneau d’accent */
+    --panel-shadow-hover:
+        0 14px 36px rgba(0, 0, 0, .22),
+        0 6px 16px rgba(0, 0, 0, .14),
+        0 2px 6px rgba(0, 0, 0, .10);
+    --item-shadow-hover:
+        0 10px 26px rgba(0, 0, 0, .20),
+        0 4px 12px rgba(0, 0, 0, .14),
+        0 1px 4px rgba(0, 0, 0, .10);
+    --fab-shadow-hover: 0 12px 30px rgba(0, 0, 0, .25);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,6 +45,17 @@
         --card-bg: rgba(0, 0, 0, .25);
         --card-bdr: rgba(255, 255, 255, .15);
         --shadow: rgba(0, 0, 0, .55);
+
+        /* Mode sombre: ombres plus fortes */
+        --panel-shadow-hover:
+            0 32px 96px rgba(0, 0, 0, .55),
+            0 8px 24px rgba(0, 0, 0, .45),
+            0 2px 6px rgba(0, 0, 0, .35);
+        --item-shadow-hover:
+            0 18px 48px rgba(0, 0, 0, .55),
+            0 6px 18px rgba(0, 0, 0, .45),
+            0 2px 6px rgba(0, 0, 0, .35);
+        --fab-shadow-hover: 0 18px 48px rgba(0, 0, 0, .45);
     }
 }
 
@@ -46,6 +68,16 @@
     --card-bg: rgba(255, 255, 255, .12);
     --card-bdr: rgba(255, 255, 255, .25);
     --shadow: rgba(0, 0, 0, .12);
+
+    --panel-shadow-hover:
+        0 14px 36px rgba(0, 0, 0, .22),
+        0 6px 16px rgba(0, 0, 0, .14),
+        0 2px 6px rgba(0, 0, 0, .10);
+    --item-shadow-hover:
+        0 10px 26px rgba(0, 0, 0, .20),
+        0 4px 12px rgba(0, 0, 0, .14),
+        0 1px 4px rgba(0, 0, 0, .10);
+    --fab-shadow-hover: 0 12px 30px rgba(0, 0, 0, .25);
 }
 
 :root[data-theme="dark"] {
@@ -57,6 +89,16 @@
     --card-bg: rgba(0, 0, 0, .25);
     --card-bdr: rgba(255, 255, 255, .15);
     --shadow: rgba(0, 0, 0, .55);
+
+    --panel-shadow-hover:
+        0 32px 96px rgba(0, 0, 0, .55),
+        0 8px 24px rgba(0, 0, 0, .45),
+        0 2px 6px rgba(0, 0, 0, .35);
+    --item-shadow-hover:
+        0 18px 48px rgba(0, 0, 0, .55),
+        0 6px 18px rgba(0, 0, 0, .45),
+        0 2px 6px rgba(0, 0, 0, .35);
+    --fab-shadow-hover: 0 18px 48px rgba(0, 0, 0, .45);
 }
 
 /* =========================
@@ -123,22 +165,22 @@ main {
 .panel:hover {
     transform: translateY(-6px);
     border-color: color-mix(in oklab, var(--accent) 40%, var(--card-bdr));
-    /* ombre très prononcée et profonde */
+    /* Anneau d’accent + ombre douce (mode clair) / forte (mode sombre) via variables */
     box-shadow:
-        0 32px 96px rgba(0, 0, 0, .55),
-        0 8px 24px rgba(0, 0, 0, .45),
-        0 2px 6px rgba(0, 0, 0, .35);
+        0 0 0 3px color-mix(in oklab, var(--accent) 28%, transparent),
+        var(--panel-shadow-hover);
 }
 
 .panel>h1 {
     margin: 0 0 20px 0;
     font-size: clamp(28px, 3vw, 34px);
     line-height: 1.25;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    font-weight: 700;
+    /* un peu plus léger qu’avant */
+    letter-spacing: -0.3px;
     text-align: center;
     color: var(--text);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .18);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .14);
 }
 
 /* =========================
@@ -187,7 +229,7 @@ canvas {
 }
 
 .theme-fab:hover {
-    box-shadow: 0 18px 48px rgba(0, 0, 0, .45);
+    box-shadow: var(--fab-shadow-hover);
 }
 
 .theme-ico {
@@ -268,7 +310,11 @@ body:has(.theme-menu:hover) .theme-menu {
     font-size: 15px;
     font-weight: 500;
     text-align: left;
-    transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    transition:
+        background-color .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease,
+        transform .18s ease;
     box-shadow: none;
     /* pas d’ombre par défaut */
 }
@@ -277,11 +323,10 @@ body:has(.theme-menu:hover) .theme-menu {
     background: color-mix(in oklab, var(--accent) 24%, transparent);
     border-color: color-mix(in oklab, var(--accent) 60%, white);
     transform: translateY(-2px);
-    /* ombre très marquée et large */
+    /* Anneau d’accent + ombre douce/forte selon thème */
     box-shadow:
-        0 18px 48px rgba(0, 0, 0, .55),
-        0 6px 18px rgba(0, 0, 0, .45),
-        0 2px 6px rgba(0, 0, 0, .35);
+        0 0 0 2px color-mix(in oklab, var(--accent) 30%, transparent),
+        var(--item-shadow-hover);
 }
 
 .theme-item[aria-checked="true"] {
@@ -293,7 +338,7 @@ body:has(.theme-menu:hover) .theme-menu {
 }
 
 /* =========================
-   Footer de crédits
+   Footer de crédits — supprimer le rectangle
    ========================= */
 footer {
     flex-shrink: 0;
@@ -307,8 +352,11 @@ footer {
     font-weight: 500;
     color: var(--muted);
     opacity: .9;
-    backdrop-filter: blur(18px) saturate(150%);
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    background: none;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     position: relative;
     z-index: 10;
     white-space: nowrap;
